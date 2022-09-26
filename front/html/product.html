@@ -45,7 +45,7 @@
 
     <main class="limitedWidthBlockContainer">
       <div class="limitedWidthBlock">
-        <section class="item">
+        <section class="item" id="itemId">
           <article>
             <div class="item__img" id="itemImg">
               <!-- <img src="../images/logo.png" alt="Photographie d'un canapé"> -->
@@ -66,9 +66,7 @@
                 <div class="item__content__settings__color">
                   <label for="color-select">Choisir une couleur :</label>
                   <select name="color-select" id="colors">
-                      <option value="">--SVP, choisissez une couleur --</option>
-<!--                       <option value="vert">vert</option>
-                      <option value="blanc">blanc</option> -->
+                      <option value="" id="0">--SVP, choisissez une couleur --</option>
                   </select>
                 </div>
 
@@ -79,15 +77,33 @@
               </div>
 
               <div class="item__content__addButton">
-                <button id="addToCart">Ajouter au panier</button>
+                <button id="addToCart" onclick="submitToCart()" >Ajouter au panier</button>
               </div>
-
             </div>
+            
+            <!-- modal error -->
+            <div class="modal__error-wrapper">
+              <div class="modal__error-content">
+                <div class="modal__error-icon" id="error-icon"></div>
+                <div class="modal__error-text" id="error-text"></div>
+              </div>
+            </div>
+            
+            <!-- modal validation -->
+            <div class="modal__validation-wrapper">
+              <div class="modal__validation-content">
+                <div class="modal__validation-icon" id="validation-icon"></div>
+                <div class="modal__validation-text" id="validation-text"></div>
+              </div>
+            </div>
+
           </article>
         </section>
       </div>
     </main>
-    
+
+  
+
     <footer>
       <div class="limitedWidthBlockContainer footerMain">
         <div class="limitedWidthBlock">

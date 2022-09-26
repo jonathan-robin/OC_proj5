@@ -91,6 +91,15 @@
 	box-shadow: rgba(42, 18, 206, 0.9) 0 0 22px 6px;
 }
 
+.modal__error-wrapper{  display: none; width: 100%;}
+.modal__error-content{  background-color: red; }
+.modal__error-icon{  }
+.modal--error-text{  }
+
+.modal__validation-wrapper{ display: none; width: 100%; }
+.modal__validation-content{ background-color: green; }
+.modal__validation-icon{  }
+.modal__validation-text{  }
 
 
 
