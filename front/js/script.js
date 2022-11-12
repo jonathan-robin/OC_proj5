@@ -5,13 +5,15 @@ const apiBaseUrl = "http://localhost:3000/api/products";
 // init fetch object
 const myheaders = new Headers(); 
 // @param verb: string http method 
-function initFetch(verb){
-    return {
+function initFetch(verb, body = null){
+    let prop = {
         method: verb,
         headers: myheaders, 
         mode: 'cors',
-        cache: 'default'
+        cache: 'default', 
     }
+    body ? prop.body = body : null; 
+    return prop;
 }
 
 // get all products from api
@@ -33,8 +35,8 @@ function getProduct(){
     let id = getURLParam(window.location.href, 'id');
     
     fetch(`${apiBaseUrl}/${id}`, initFetch('GET')) // get product infos
-    .then(res => res.json()) // json formatted
-    .then(res =>  initProductPage(res)) //add product infos to html
+        .then(res => res.json()) // json formatted
+        .then(res =>  initProductPage(res)) //add product infos to html
 }
 
 async function getPlainProduct(productId){
@@ -52,18 +54,78 @@ function getCart(){
     Object.entries(cart).map(([key, value]) => {  // foreach key in cart (product) we create html article 
         return initCartProduct(key, value); 
     })
+
+    // add event listener on submit click
+    document.getElementById("order-form").addEventListener("submit", async function(event) {
+        event.preventDefault();
+        fetch(`${apiBaseUrl}/order`,  { method: "POST", body: JSON.stringify({ 
+            contact : {
+                firstName:  document.getElementById('firstName').value,
+                lastName:  document.getElementById('lastName').value,
+                address:  document.getElementById('address').value,
+                city:  document.getElementById('city').value,
+                email:  document.getElementById('email').value,
+            }, 
+            products: Object.entries(getLocalStorageJsonObject()).map(([key, value]) => { 
+               return JSON.parse(value).id;
+            })
+        }),            headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+      }) 
+    .then(res => { 
+        if (res.status === 201){ 
+            return res.json();
+        }
+        else return 500
+    }) // json formatted
+    .then(res => {
+        if (res != 500){ 
+            return  window.location.replace(`file:///D:/save/part_time_job/OPEN_CLASSROOMS/projets/p5/P5-Dev-Web-Kanap/front/html/confirmation.html?orderId=${res.orderId}`);
+        }
+    }) 
+      });
 }
 
-// call onclick on button, delete one item in local storage with itemId
-function deleteItem(cartProductId){ 
+
+function getConfirmation(){ 
+    let orderId = getURLParam(window.location.href, 'orderId');
+    console.log(orderId);
+    document.getElementById('orderId').innerHTML =  orderId;
+
+}
+
+// call onclick on button "supprimer" on cart page or input minus 1 quantity
+//  delete one item in local storage with itemId
+// function deleteItem(cartProductId){ 
+//     let product = getProductJsonObject(cartProductId); // get the product as an object
+//     product.quantity -= 1; // minus 1 quantity of it
+//     product.quantity === 0 ? removeProduct(cartProductId) : replaceProduct(cartProductId, product);
+//     displayTotalsForProducts() // recalculate the total 
+// }   
+
+// input on cart page, on value change -> add one quantity
+function changeValueOnItem(cartProductId, verb){ 
     let product = getProductJsonObject(cartProductId); // get the product as an object
-    product.quantity -= 1; // minus 1 quantity of it
-    product.quantity === 0 ? removeProduct(cartProductId) : replaceProduct(cartProductId, product);
+    console.log(product);
+    switch (verb){
+        case 'remove': 
+            product.quantity -= 1;
+            product.quantity === 0 ? removeProduct(cartProductId) : replaceProduct(cartProductId, product);
+        break;
+        case 'add': 
+            product.quantity += 1;
+            replaceProduct(cartProductId, product);
+        break;
+    }
     displayTotalsForProducts() // recalculate the total 
 }   
 
 //  call on change in quantity 
 function replaceProduct(cartProductId, product){ 
+    console.log(cartProductId); 
+    console.log(product);
     setProductJsonObject(cartProductId, product); // set the new quantity in localStorage
     replaceProductHTML(product.id, cartProductId); // set the new quantity in the HTML
 }
@@ -177,13 +239,17 @@ async function initCartProduct(productId, values){
     displayTotalsForProducts();
 
     document.getElementById('delete-'+productId).addEventListener('click', () => { // once the button is created add event listener for delete click
-        deleteItem(productId)
+        changeValueOnItem(productId, 'remove');
+    })
+    document.getElementById('changeValue-'+productId).addEventListener('input', function(evt) { // once the button is created add event listener for delete click
+        let previousValue =  getProductJsonObject(productId).quantity;
+        this.value > previousValue ? changeValueOnItem(productId, 'add') : changeValueOnItem(productId, 'remove');
     })
 }
 
 // init the article html for a product in cart page
 function getProductHtml(productId, values, product){
-   return `<div class="cart__item__img">
+   return  `<div class="cart__item__img">
                 <img src="${product.imageUrl}" id="product-image" alt="${product.altTxt}">
             </div>
             <div class="cart__item__content">
@@ -195,7 +261,7 @@ function getProductHtml(productId, values, product){
                 <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
                         <p>Qté : </p>
-                        <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${values.quantity}">
+                        <input type="number" id="changeValue-${productId}" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${values.quantity}">
                     </div>
                     <div class="cart__item__content__settings__delete">
                         <p class="deleteItem" id="delete-${productId}">Supprimer</p>
@@ -241,11 +307,6 @@ async function getTotalsForProducts(){
 
     return {totalProduct, totalPrice}; 
  }
-
-function getTotalPrice(){ 
-    // let total = 0; 
-    // Object.entries(getLocal)
-}
 
 // get the product infos to add to cart
 function getProductInfos(){

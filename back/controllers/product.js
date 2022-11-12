@@ -1,6 +1,7 @@
 const uuid = require('uuid/v1');
 const Product = require('../models/Product');
 
+
 exports.getAllProducts = (req, res, next) => {
   Product.find().then(
     (products) => {
@@ -47,6 +48,9 @@ exports.getOneProduct = (req, res, next) => {
  *
  */
 exports.orderProducts = (req, res, next) => {
+  console.log('enter orderProducts'); 
+  console.log(req);
+  console.log(req.body);
   if (!req.body.contact ||
       !req.body.contact.firstName ||
       !req.body.contact.lastName ||
