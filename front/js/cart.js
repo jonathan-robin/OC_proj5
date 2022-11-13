@@ -104,7 +104,6 @@ function getCart(){
 // input on cart page, on value change -> add one quantity
 function changeValueOnItem(cartProductId, verb){ 
     let product = getProductJsonObject(cartProductId); // get the product as an object
-    console.log(product);
     switch (verb){
         case 'remove': 
             product.quantity -= 1;

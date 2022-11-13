@@ -22,7 +22,6 @@ function initProductPage(product){
 
 // Add product to cart onclick on add to cart
 function submitToCart(){ 
-    console.log("Checking submitting order...")
     let productInfos = getProductInfos()
     Object.entries(validateProduct(productInfos)).forEach(([key, value]) => { 
         value ? addToCart(productInfos) : getMessageError(key);
