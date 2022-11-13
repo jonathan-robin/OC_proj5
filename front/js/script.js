@@ -1,6 +1,4 @@
-// const { getOneProduct } = require("../../back/controllers/product");
-
-const apiBaseUrl = "http://localhost:3000/api/products"; 
+const apiBaseUrl = "http://localhost:3000/api/products";
 
 // init fetch object
 const myheaders = new Headers(); 
@@ -28,122 +26,10 @@ function getAllProducts(){
     }) 
 }
 
-// get one specific produt 
-function getProduct(){ 
-    // get product id from url
-    // let params = getURLParams(window.location.href);
-    let id = getURLParam(window.location.href, 'id');
-    
-    fetch(`${apiBaseUrl}/${id}`, initFetch('GET')) // get product infos
-        .then(res => res.json()) // json formatted
-        .then(res =>  initProductPage(res)) //add product infos to html
-}
-
-async function getPlainProduct(productId){
-    let p = await fetch(`${apiBaseUrl}/${productId}`, initFetch('GET')) // get product infos
-    .then(res => res.json()) // json formatted
-    return p;
-}
-
-const fetchPromise = (productId) => fetch(`${apiBaseUrl}/${productId}`, initFetch('GET')) // get product infos;
-
-// get entire products infos in the cart
-// call onload cart page
-function getCart(){ 
-    let cart = JSON.parse(localStorage.getItem('cart')); // get the cart and parse it
-    Object.entries(cart).map(([key, value]) => {  // foreach key in cart (product) we create html article 
-        return initCartProduct(key, value); 
-    })
-
-    // add event listener on submit click
-    document.getElementById("order-form").addEventListener("submit", async function(event) {
-        event.preventDefault();
-        fetch(`${apiBaseUrl}/order`,  { method: "POST", body: JSON.stringify({ 
-            contact : {
-                firstName:  document.getElementById('firstName').value,
-                lastName:  document.getElementById('lastName').value,
-                address:  document.getElementById('address').value,
-                city:  document.getElementById('city').value,
-                email:  document.getElementById('email').value,
-            }, 
-            products: Object.entries(getLocalStorageJsonObject()).map(([key, value]) => { 
-               return JSON.parse(value).id;
-            })
-        }),            headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-      }) 
-    .then(res => { 
-        if (res.status === 201){ 
-            return res.json();
-        }
-        else return 500
-    }) // json formatted
-    .then(res => {
-        if (res != 500){ 
-            return  window.location.replace(`file:///D:/save/part_time_job/OPEN_CLASSROOMS/projets/p5/P5-Dev-Web-Kanap/front/html/confirmation.html?orderId=${res.orderId}`);
-        }
-    }) 
-      });
-}
-
-
-function getConfirmation(){ 
-    let orderId = getURLParam(window.location.href, 'orderId');
-    console.log(orderId);
-    document.getElementById('orderId').innerHTML =  orderId;
-
-}
-
-// call onclick on button "supprimer" on cart page or input minus 1 quantity
-//  delete one item in local storage with itemId
-// function deleteItem(cartProductId){ 
-//     let product = getProductJsonObject(cartProductId); // get the product as an object
-//     product.quantity -= 1; // minus 1 quantity of it
-//     product.quantity === 0 ? removeProduct(cartProductId) : replaceProduct(cartProductId, product);
-//     displayTotalsForProducts() // recalculate the total 
-// }   
-
-// input on cart page, on value change -> add one quantity
-function changeValueOnItem(cartProductId, verb){ 
-    let product = getProductJsonObject(cartProductId); // get the product as an object
-    console.log(product);
-    switch (verb){
-        case 'remove': 
-            product.quantity -= 1;
-            product.quantity === 0 ? removeProduct(cartProductId) : replaceProduct(cartProductId, product);
-        break;
-        case 'add': 
-            product.quantity += 1;
-            replaceProduct(cartProductId, product);
-        break;
-    }
-    displayTotalsForProducts() // recalculate the total 
-}   
-
 //  call on change in quantity 
 function replaceProduct(cartProductId, product){ 
-    console.log(cartProductId); 
-    console.log(product);
     setProductJsonObject(cartProductId, product); // set the new quantity in localStorage
     replaceProductHTML(product.id, cartProductId); // set the new quantity in the HTML
-}
-
-function addToCart(productInfos){
-    document.getElementsByClassName('modal__error-wrapper')[0].style.display = "none"; 
-
-    let guid = productInfos.id + '_' + productInfos.color;
-    let cartTmp = localStorage['cart'] ? JSON.parse(localStorage['cart']) : {};
-
-    if (cartTmp[guid]){
-        let productParsed = getProductJsonObject(guid);
-        productParsed.quantity += productInfos.quantity;
-        return setProductJsonObject(guid, productParsed);
-    }
-
-    cartTmp[guid] = JSON.stringify(productInfos);
-    return localStorage.setItem('cart', JSON.stringify(cartTmp))
 }
 
 // remove a product 
@@ -168,22 +54,13 @@ function getLocalStorageJsonObject(){
 function getProductJsonObject(id){ 
     return JSON.parse(getLocalStorageJsonObject()[id]);
 }
+
 // set localStorage with changed product item
 function setProductJsonObject(id, product){
     let parsedCart = getLocalStorageJsonObject();
     parsedCart[id] = JSON.stringify(product); 
     return localStorage.setItem('cart', JSON.stringify(parsedCart));
 }
-
-// replace the product Quantity in HTML by the current localStorage quantity
-//  recalculate price
-function replaceProductHTML(productId, cartProductId){ 
-    document.getElementById(cartProductId).getElementsByClassName('itemQuantity')[0].value = getProductJsonObject(cartProductId).quantity;
-    getPlainProduct(productId).then(res => { 
-        document.getElementById(cartProductId).getElementsByClassName('cart__item__content__description')[0].getElementsByTagName('p')[1].innerHTML = getProductJsonObject(cartProductId).quantity * res.price
-    })
-}
-
 
 // get a specific param of a url
 // @param url: the full url page
@@ -205,88 +82,6 @@ function getURLParams(url){
     return paramsObj;
 }
 
-// init productPage with product infos
-// @param product: json object api with value for given object
-function initProductPage(product){
-    document.getElementById('itemId').setAttribute( 'itemId', product._id);
-    document.getElementById('itemImg').innerHTML = `<img src="${product.imageUrl}" alt="${product.altTxt}">`
-    document.getElementById('title').innerHTML = product.name
-    document.getElementById('price').innerHTML = product.price
-    document.getElementById('description').innerHTML = product.description
-    document.getElementById('colors').innerHTML +=  product.colors.map((color, index) => `<option id=${index + 1}>${color}</option>`)
-}
-
-// get plain data for product with backend and render HTML in cart page
-async function initCartProduct(productId, values){ 
-    let cartInfos = JSON.parse(values);
-
-    // create html node to append to section
-    let section = document.getElementById('cart__items'); 
-    let article = document.createElement('article'); 
-
-    // set attributes for article
-    article.setAttribute('class', 'cart__item');
-    article.setAttribute('id', productId);
-    article.setAttribute('data-color', values.color)
-
-    //get the plain string html to append to article
-    let html = await getPlainProduct(cartInfos.id)
-    .then(res => getProductHtml(productId, cartInfos, res));
-
-    article.innerHTML = html
-    section.appendChild(article)
-
-    displayTotalsForProducts();
-
-    document.getElementById('delete-'+productId).addEventListener('click', () => { // once the button is created add event listener for delete click
-        changeValueOnItem(productId, 'remove');
-    })
-    document.getElementById('changeValue-'+productId).addEventListener('input', function(evt) { // once the button is created add event listener for delete click
-        let previousValue =  getProductJsonObject(productId).quantity;
-        this.value > previousValue ? changeValueOnItem(productId, 'add') : changeValueOnItem(productId, 'remove');
-    })
-}
-
-// init the article html for a product in cart page
-function getProductHtml(productId, values, product){
-   return  `<div class="cart__item__img">
-                <img src="${product.imageUrl}" id="product-image" alt="${product.altTxt}">
-            </div>
-            <div class="cart__item__content">
-                <div class="cart__item__content__description">
-                    <h2>${product.name}</h2>
-                    <p>${values.color}</p>
-                    <p>${product.price * values.quantity}€</p>
-                </div>
-                <div class="cart__item__content__settings">
-                    <div class="cart__item__content__settings__quantity">
-                        <p>Qté : </p>
-                        <input type="number" id="changeValue-${productId}" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${values.quantity}">
-                    </div>
-                    <div class="cart__item__content__settings__delete">
-                        <p class="deleteItem" id="delete-${productId}">Supprimer</p>
-                    </div>
-                </div>
-            </div>`
-}
-
-// Add product to cart onclick on add to cart
-function submitToCart(){ 
-    console.log("Checking submitting order...")
-    let productInfos = getProductInfos()
-    Object.entries(validateProduct(productInfos)).forEach(([key, value]) => { 
-        value ? addToCart(productInfos) : getMessageError(key);
-    })
-}
-
-// call each time we need to recalculate the total amount and the total articles in cart
-async function displayTotalsForProducts(){ 
-    //  await the total for the products to calculate
-    await getTotalsForProducts().then(res => { // set the value in the HTML
-        document.getElementById('totalQuantity').innerHTML = res.totalProduct; 
-        document.getElementById('totalPrice').innerHTML = res.totalPrice;
-    })
-}
 
 // call on first cart load and each time a product is added or remove
 async function getTotalsForProducts(){
@@ -317,13 +112,5 @@ function getProductInfos(){
     }
 }
 
-// validation for adding to the cart
-function validateProduct({id, quantity, color}){
-    return quantity ? quantity && color ? { valid: true } : { color: false } : { quantity : false };
-}
 
-// return a message error if submitting failed
-function getMessageError(error){ 
-    document.getElementsByClassName('modal__error-wrapper')[0].style.display = "block"; 
-    document.getElementsByClassName('modal__error-text')[0].innerHTML = 'Error... Please enter a valid ' + error + '.';
-}
+
