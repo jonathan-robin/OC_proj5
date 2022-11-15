@@ -1,4 +1,4 @@
-const apiBaseUrl = "http://localhost:3000/api/products";
+let apiBaseUrl = "http://localhost:3000/api/products";
 
 // init fetch object
 const myheaders = new Headers(); 
@@ -21,7 +21,7 @@ function getAllProducts(){
     .then(res => {
         let elt = document.getElementById('items'); 
         res.map(e => { 
-            return elt.innerHTML +=  `<a href='./product.html?id=${e._id}'><article id='${e._id}'><img src='${e.imageUrl}' alt='${e.altTxt}'><h3 class='productName'>${e.name}</h3><p class='productDescription'>${e.description}</p></article></a>`
+            return elt.innerHTML += `<a href='./product.html?id=${e._id}'><article id='${e._id}'><img src='${e.imageUrl}' alt='${e.altTxt}'><h3 class='productName'>${e.name}</h3><p class='productDescription'>${e.description}</p></article></a>`
         })
     }) 
 }
@@ -38,6 +38,8 @@ function removeProduct(id){
     delete localStorageTmp[id]; // delete the entry in ther local storage with corresponding id
     localStorage.setItem('cart', JSON.stringify(localStorageTmp)); // reset the local storage minus product
     removeProductFromHTML(id); // delete product from HTML
+    getTotalsForProducts();
+    displayTotalsForProducts();
 }
 
 // remove a product from the HTML
