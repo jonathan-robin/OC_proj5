@@ -28,6 +28,7 @@ function submitToCart(){
     })
 }
 
+// adding a product to cart
 function addToCart(productInfos){
     document.getElementsByClassName('modal__error-wrapper')[0].style.display = "none"; 
     document.getElementsByClassName('modal__success-wrapper')[0].style.display = "none"; 

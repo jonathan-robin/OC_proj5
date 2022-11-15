@@ -97,6 +97,7 @@ function getProductHtml(productId, values, product){
             </div>`
 }
 
+// return product data for a given id
 async function getPlainProduct(productId){
     let p = await fetch(`${apiBaseUrl}/${productId}`, initFetch('GET')) // get product infos
     .then(res => res.json()) // json formatted
