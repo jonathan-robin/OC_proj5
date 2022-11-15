@@ -96,8 +96,8 @@
 .modal__error-icon{  }
 .modal--error-text{  }
 
-.modal__validation-wrapper{ display: none; width: 100%; }
-.modal__validation-content{ background-color: green; }
+.modal__success-wrapper{ display: none; width: 100%; }
+.modal__success-content{ background-color: green; }
 .modal__validation-icon{  }
 .modal__validation-text{  }
 

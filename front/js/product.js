@@ -30,6 +30,7 @@ function submitToCart(){
 
 function addToCart(productInfos){
     document.getElementsByClassName('modal__error-wrapper')[0].style.display = "none"; 
+    document.getElementsByClassName('modal__success-wrapper')[0].style.display = "none"; 
 
     let guid = productInfos.id + '_' + productInfos.color;
     let cartTmp = localStorage['cart'] ? JSON.parse(localStorage['cart']) : {};
@@ -41,7 +42,13 @@ function addToCart(productInfos){
     }
 
     cartTmp[guid] = JSON.stringify(productInfos);
+
+    document.getElementsByClassName('modal__success-wrapper')[0].style.display  = "block";
+    document.getElementsByClassName('modal__success-content')[0].innerHTML = "Product added !"
+
     return localStorage.setItem('cart', JSON.stringify(cartTmp))
+
+
 }
 
 // validation for adding to the cart
@@ -51,6 +58,7 @@ function validateProduct({id, quantity, color}){
 
 // return a message error if submitting failed
  function getMessageError(error){ 
+    document.getElementsByClassName('modal__success-wrapper')[0].style.display = "none"; 
     document.getElementsByClassName('modal__error-wrapper')[0].style.display = "block"; 
     document.getElementsByClassName('modal__error-text')[0].innerHTML = 'Error... Please enter a valid ' + error + '.';
 }

@@ -136,16 +136,3 @@ async function displayTotalsForProducts(){
         document.getElementById('totalPrice').innerHTML = res.totalPrice;
     })
 }
-
-// remove a product 
-// function removeProduct(id){ 
-//     let localStorageTmp = getLocalStorageJsonObject(); 
-//     delete localStorageTmp[id]; // delete the entry in ther local storage with corresponding id
-//     localStorage.setItem('cart', JSON.stringify(localStorageTmp)); // reset the local storage minus product
-//     removeProductFromHTML(id); // delete product from HTML
-// }
-
-// remove a product from the HTML
-// function removeProductFromHTML(id){ 
-//     document.getElementById(id).style = 'display : none';
-// }

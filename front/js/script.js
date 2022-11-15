@@ -21,7 +21,14 @@ function getAllProducts(){
     .then(res => {
         let elt = document.getElementById('items'); 
         res.map(e => { 
-            return elt.innerHTML += `<a href='./product.html?id=${e._id}'><article id='${e._id}'><img src='${e.imageUrl}' alt='${e.altTxt}'><h3 class='productName'>${e.name}</h3><p class='productDescription'>${e.description}</p></article></a>`
+            return elt.innerHTML += `
+            <a href='./product.html?id=${e._id}'>
+                <article id='${e._id}'><img src='${e.imageUrl}' alt='${e.altTxt}'>
+                    <h3 class='productName'>${e.name}</h3>
+                    <p class='productDescription'>${e.description}</p>
+                </article>
+            </a>
+            `
         })
     }) 
 }
