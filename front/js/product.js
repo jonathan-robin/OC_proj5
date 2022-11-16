@@ -30,7 +30,10 @@ function submitToCart(){
 
 // adding a product to cart
 function addToCart(productInfos){
-    document.getElementsByClassName('modal__error-wrapper')[0].style.display = "none"; 
+
+    if (document.getElementById('divError')){ 
+        document.getElementById('divError').style.display = "none";
+    }
 
     let guid = productInfos.id + '_' + productInfos.color;
     let cartTmp = localStorage['cart'] ? JSON.parse(localStorage['cart']) : {};
@@ -43,8 +46,15 @@ function addToCart(productInfos){
 
     cartTmp[guid] = JSON.stringify(productInfos);
 
-    document.getElementsByClassName('modal__success-wrapper')[0].style.display  = "block";
-    document.getElementsByClassName('modal__success-content')[0].innerHTML = "Product added !";
+    let section = document.getElementsByClassName('item__content')[0];
+    let divValid = document.createElement('div'); 
+    divValid.setAttribute('id', 'divValid');
+
+    divValid.style = "background: green";
+    divValid.innerHTML = 'Product added! ';
+    section.appendChild(divValid)
+
+    document.getElementById('divValid').style.display = "block";
 
     return localStorage.setItem('cart', JSON.stringify(cartTmp));
 }
@@ -56,9 +66,17 @@ function validateProduct({id, quantity, color}){
 
 // return a message error if submitting failed
  function getMessageError(error){ 
-    document.getElementsByClassName('modal__success-wrapper')[0].style.display = "none"; 
-    document.getElementsByClassName('modal__error-wrapper')[0].style.display = "block"; 
-    document.getElementsByClassName('modal__error-text')[0].innerHTML = 'Error... Please enter a valid ' + error + '.';
+    if (document.getElementById('divValid')){ 
+        document.getElementById('divValid').style.display = "none"
+    }
+
+    let section = document.getElementsByClassName('item__content')[0];
+    let divError = document.createElement('div');
+    divError.setAttribute('id', 'divError');
+
+    divError.style = "background: red";
+    divError.innerHTML = 'Error... Please enter a valid ' + error + '.';
+    section.appendChild(divError)
 }
 
 // get the product infos to add to cart
