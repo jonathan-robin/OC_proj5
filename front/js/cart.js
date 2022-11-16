@@ -7,40 +7,46 @@ function getCart(){
         return initCartProduct(key, value); 
     })
 
-    if (Object.keys(getLocalStorageJsonObject).length === 0){ 
-        hideFormIfCartIsEmtpy();
+    console.log(Object.keys(getLocalStorageJsonObject()).length)
+
+    if (Object.keys(getLocalStorageJsonObject()).length === 0){ 
+        toggleCartVisibility('none');
+    }
+    else{ 
+        toggleCartVisibility('block');
     }
 
     // add event listener on submit click
     document.getElementById("order-form").addEventListener("submit", async function(event) {
         event.preventDefault();
-        fetch(`${apiBaseUrl}/order`,  { method: "POST", body: JSON.stringify({ 
-            contact : {
-                firstName:  document.getElementById('firstName').value,
-                lastName:  document.getElementById('lastName').value,
-                address:  document.getElementById('address').value,
-                city:  document.getElementById('city').value,
-                email:  document.getElementById('email').value,
-            }, 
-            products: Object.entries(getLocalStorageJsonObject()).map(([key, value]) => { 
-               return JSON.parse(value).id;
-            })
-        }),            headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-      }) 
-    .then(res => { 
-        if (res.status === 201){ 
-            return res.json();
-        }
-        else return 500
-    }) // json formatted
-    .then(res => {
-        if (res != 500){ 
-            return window.location.replace(`/confirmation.html?orderId=${res.orderId}`);
-        }
-    }) 
+        checkFormValues();
+    //     fetch(`${apiBaseUrl}/order`,  { method: "POST", body: JSON.stringify({ 
+    //         contact : {
+    //             firstName:  document.getElementById('firstName').value,
+    //             lastName:  document.getElementById('lastName').value,
+    //             address:  document.getElementById('address').value,
+    //             city:  document.getElementById('city').value,
+    //             email:  document.getElementById('email').value,
+    //         }, 
+    //         products: Object.entries(getLocalStorageJsonObject()).map(([key, value]) => { 
+    //            return JSON.parse(value).id;
+    //         })
+    //     }),            headers: {
+    //         'Content-Type': 'application/json',
+    //         'Accept': 'application/json'
+    //     },
+    //   }) 
+    // .then(res => { 
+    //     if (res.status === 201){ 
+    //         return res.json();
+    //     }
+    //     else return 500
+    // }) // json formatted
+    // .then(res => {
+    //     if (res != 500){ 
+    //         return window.location.replace(`/confirmation.html?orderId=${res.orderId}`);
+    //     }
+    // }) 
       });
 }
 
@@ -156,8 +162,11 @@ function removeProduct(id){
     removeProductFromHTML(id); // delete product from HTML
     getTotalsForProducts();
     displayTotalsForProducts();
-    if (Object.keys(getLocalStorageJsonObject).length === 0){ 
-        hideFormIfCartIsEmtpy();
+    if (Object.keys(getLocalStorageJsonObject()).length === 0){ 
+        toggleCartVisibility('none');
+    }
+    else{ 
+        toggleCartVisibility('block');
     }
 }
 
@@ -186,6 +195,24 @@ async function getTotalsForProducts(){
  }
 
 //  hide the form if cart is empty 
-function hideFormIfCartIsEmtpy(){ 
-    document.getElementById('order-form').style.display  ='none';
+function toggleCartVisibility(verb){ 
+    document.getElementById('order-form').style.display = verb;
 }   
+
+
+function checkFormValues(){ 
+    let stringRegex = new RegExp(/^[a-zA-Z\s-]*$/); 
+    let stringNumberRegex = new RegExp(/^[a-zA-Z\s0-9-,]*$/); 
+    let emailRegex = new RegExp(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)
+     
+    if (stringRegex.test(document.getElementById('firstName').value) && stringRegex.test(document.getElementById('lastName').value) && stringRegex.test(document.getElementById('city').value)){ 
+        console.log('firstname and name ok and city')
+    }if(stringNumberRegex.test(document.getElementById('address').value)){ 
+        console.log('adress ok')
+    }if(emailRegex.test(document.getElementById('email').value)){ 
+        console.log('email ok')
+    }
+    else{ 
+        console.log('nok')
+    }
+}
