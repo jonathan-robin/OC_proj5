@@ -7,6 +7,10 @@ function getCart(){
         return initCartProduct(key, value); 
     })
 
+    if (Object.keys(getLocalStorageJsonObject).length === 0){ 
+        hideFormIfCartIsEmtpy();
+    }
+
     // add event listener on submit click
     document.getElementById("order-form").addEventListener("submit", async function(event) {
         event.preventDefault();
@@ -34,7 +38,7 @@ function getCart(){
     }) // json formatted
     .then(res => {
         if (res != 500){ 
-            return  window.location.replace(`file:///D:/save/part_time_job/OPEN_CLASSROOMS/projets/p5/P5-Dev-Web-Kanap/front/html/confirmation.html?orderId=${res.orderId}`);
+            return window.location.replace(`/confirmation.html?orderId=${res.orderId}`);
         }
     }) 
       });
@@ -66,7 +70,6 @@ async function initCartProduct(productId, values){
     document.getElementById('delete-'+productId).addEventListener('click', () => { // once the button is created add event listener for delete click
         // changeValueOnItem(productId, 'remove');
         removeProduct(productId);
-
     })
     document.getElementById('changeValue-'+productId).addEventListener('input', function(evt) { // once the button is created add event listener for delete click
         let previousValue =  getProductJsonObject(productId).quantity;
@@ -137,3 +140,52 @@ async function displayTotalsForProducts(){
         document.getElementById('totalPrice').innerHTML = res.totalPrice;
     })
 }
+
+ //  call on change in quantity 
+ function replaceProduct(cartProductId, product){ 
+    setProductJsonObject(cartProductId, product); // set the new quantity in localStorage
+    replaceProductHTML(product.id, cartProductId); // set the new quantity in the HTML
+    console.log(getLocalStorageJsonObject());
+}
+
+// remove a product 
+function removeProduct(id){ 
+    let localStorageTmp = getLocalStorageJsonObject(); 
+    delete localStorageTmp[id]; // delete the entry in ther local storage with corresponding id
+    localStorage.setItem('cart', JSON.stringify(localStorageTmp)); // reset the local storage minus product
+    removeProductFromHTML(id); // delete product from HTML
+    getTotalsForProducts();
+    displayTotalsForProducts();
+    if (Object.keys(getLocalStorageJsonObject).length === 0){ 
+        hideFormIfCartIsEmtpy();
+    }
+}
+
+// remove a product from the HTML
+function removeProductFromHTML(id){ 
+    document.getElementById(id).style = 'display : none';
+}
+// call on first cart load and each time a product is added or remove
+async function getTotalsForProducts(){
+    let totalProduct = 0; 
+    let totalPrice = 0;
+
+    let promises = Object.entries(getLocalStorageJsonObject()).map(async([key, v]) => { // map over all the product in cart
+        let obj = await (getPlainProduct(key.split('_')[0]).then(res => res)); // get datas for each product 
+        return Object.defineProperty((obj), 'quantity', { value: JSON.parse(v).quantity }); // add to the temporary object the quantity we have in cart for this object
+    })
+
+    await Promise.all(promises).then(values => { // wait for all the promises to resolve
+        values.map(value => { // map over them
+            totalProduct += parseInt(value.quantity); // add their own quantity to the total
+            totalPrice += parseInt(value.quantity) * parseInt(value.price); // calculate the total amount
+        })
+    });
+
+    return {totalProduct, totalPrice}; 
+ }
+
+//  hide the form if cart is empty 
+function hideFormIfCartIsEmtpy(){ 
+    document.getElementById('order-form').style.display  ='none';
+}   
