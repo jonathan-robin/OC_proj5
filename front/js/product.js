@@ -63,9 +63,10 @@ function validateProduct({id, quantity, color}){
 
 // get the product infos to add to cart
 function getProductInfos(){
+    let quantityValue = parseInt(document.getElementById('quantity').value);
     return { 
         id: document.getElementById('itemId').getAttribute('itemId'), 
-        quantity: document.getElementById('quantity').value > 0 ? parseInt(document.getElementById('quantity').value) : null, 
+        quantity: quantityValue > 0 && quantityValue <= 100 && quantityValue % 1 == 0 ? parseInt(document.getElementById('quantity').value) : null, 
         color: document.getElementById('colors').options.selectedIndex > 0 ? document.getElementById('colors').value : null,
     }
 }
