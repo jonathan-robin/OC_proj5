@@ -22,7 +22,7 @@ function initProductPage(product){
 
 // Add product to cart onclick on add to cart
 function submitToCart(){ 
-    let productInfos = getProductInfos()
+    let productInfos = getProductInfos();
     Object.entries(validateProduct(productInfos)).forEach(([key, value]) => { 
         value ? addToCart(productInfos) : getMessageError(key);
     })
@@ -44,11 +44,9 @@ function addToCart(productInfos){
     cartTmp[guid] = JSON.stringify(productInfos);
 
     document.getElementsByClassName('modal__success-wrapper')[0].style.display  = "block";
-    document.getElementsByClassName('modal__success-content')[0].innerHTML = "Product added !"
+    document.getElementsByClassName('modal__success-content')[0].innerHTML = "Product added !";
 
-    return localStorage.setItem('cart', JSON.stringify(cartTmp))
-
-
+    return localStorage.setItem('cart', JSON.stringify(cartTmp));
 }
 
 // validation for adding to the cart
@@ -61,4 +59,13 @@ function validateProduct({id, quantity, color}){
     document.getElementsByClassName('modal__success-wrapper')[0].style.display = "none"; 
     document.getElementsByClassName('modal__error-wrapper')[0].style.display = "block"; 
     document.getElementsByClassName('modal__error-text')[0].innerHTML = 'Error... Please enter a valid ' + error + '.';
+}
+
+// get the product infos to add to cart
+function getProductInfos(){
+    return { 
+        id: document.getElementById('itemId').getAttribute('itemId'), 
+        quantity: document.getElementById('quantity').value > 0 ? parseInt(document.getElementById('quantity').value) : null, 
+        color: document.getElementById('colors').options.selectedIndex > 0 ? document.getElementById('colors').value : null,
+    }
 }
