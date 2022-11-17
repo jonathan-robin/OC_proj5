@@ -63,7 +63,7 @@ function getCart(){
             }) // json formatted
             .then(res => {
                 if (res != 500){ 
-                    return window.location.replace(`/confirmation.html?orderId=${res.orderId}`);
+                    return location.assign(`confirmation.html?orderId=${res.orderId}`);
                 }
             }) 
         }
