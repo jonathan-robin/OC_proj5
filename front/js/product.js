@@ -32,7 +32,12 @@ function submitToCart(){
 function addToCart(productInfos){
 
     if (document.getElementById('divError')){ 
-        document.getElementById('divError').style.display = "none";
+        let elError = document.getElementById('divError');
+        elError.parentNode.removeChild(elError);
+    }
+    if (document.getElementById('divValid')){ 
+        let elValid = document.getElementById('divValid');
+        elValid.parentNode.removeChild(elValid);
     }
 
     let guid = productInfos.id + '_' + productInfos.color;
@@ -41,21 +46,11 @@ function addToCart(productInfos){
     if (cartTmp[guid]){
         let productParsed = getProductJsonObject(guid);
         productParsed.quantity += productInfos.quantity;
+        getMessageValid(productInfos);
         return setProductJsonObject(guid, productParsed);
     }
-
     cartTmp[guid] = JSON.stringify(productInfos);
-
-    let section = document.getElementsByClassName('item__content')[0];
-    let divValid = document.createElement('div'); 
-    divValid.setAttribute('id', 'divValid');
-
-    divValid.style = "background: green";
-    divValid.innerHTML = 'Product added! ';
-    section.appendChild(divValid)
-
-    document.getElementById('divValid').style.display = "block";
-
+    getMessageValid(productInfos);
     return localStorage.setItem('cart', JSON.stringify(cartTmp));
 }
 
@@ -66,8 +61,13 @@ function validateProduct({id, quantity, color}){
 
 // return a message error if submitting failed
  function getMessageError(error){ 
+    if (document.getElementById('divError')){ 
+        let elError = document.getElementById('divError');
+        elError.parentNode.removeChild(elError);
+    }
     if (document.getElementById('divValid')){ 
-        document.getElementById('divValid').style.display = "none"
+        let elValid = document.getElementById('divValid');
+        elValid.parentNode.removeChild(elValid);
     }
 
     let section = document.getElementsByClassName('item__content')[0];
@@ -77,6 +77,26 @@ function validateProduct({id, quantity, color}){
     divError.style = "background: red";
     divError.innerHTML = 'Error... Please enter a valid ' + error + '.';
     section.appendChild(divError)
+}
+
+// return a message error if submitting failed
+function getMessageValid(productInfos){
+    if (document.getElementById('divError')){ 
+        let elError = document.getElementById('divError');
+        elError.parentNode.removeChild(elError);
+    }
+    if (document.getElementById('divValid')){ 
+        let elValid = document.getElementById('divValid');
+        elValid.parentNode.removeChild(elValid);
+    }
+
+    let section = document.getElementsByClassName('item__content')[0];
+    let divValid = document.createElement('div'); 
+    divValid.setAttribute('id', 'divValid');
+
+    divValid.style = "background: green";
+    divValid.innerHTML = 'Product added! '+productInfos.quantity + ' items - color : '+productInfos.color;
+    section.appendChild(divValid); 
 }
 
 // get the product infos to add to cart
