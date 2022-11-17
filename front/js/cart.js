@@ -18,36 +18,56 @@ function getCart(){
 
     // add event listener on submit click
     document.getElementById("order-form").addEventListener("submit", async function(event) {
+        if (document.getElementById('divError')){ 
+            let elError = document.getElementById('divError');
+            elError.parentNode.removeChild(elError);
+        }
         event.preventDefault();
-        checkFormValues();
-    //     fetch(`${apiBaseUrl}/order`,  { method: "POST", body: JSON.stringify({ 
-    //         contact : {
-    //             firstName:  document.getElementById('firstName').value,
-    //             lastName:  document.getElementById('lastName').value,
-    //             address:  document.getElementById('address').value,
-    //             city:  document.getElementById('city').value,
-    //             email:  document.getElementById('email').value,
-    //         }, 
-    //         products: Object.entries(getLocalStorageJsonObject()).map(([key, value]) => { 
-    //            return JSON.parse(value).id;
-    //         })
-    //     }),            headers: {
-    //         'Content-Type': 'application/json',
-    //         'Accept': 'application/json'
-    //     },
-    //   }) 
-    // .then(res => { 
-    //     if (res.status === 201){ 
-    //         return res.json();
-    //     }
-    //     else return 500
-    // }) // json formatted
-    // .then(res => {
-    //     if (res != 500){ 
-    //         return window.location.replace(`/confirmation.html?orderId=${res.orderId}`);
-    //     }
-    // }) 
-      });
+        let error  = checkFormValues();
+        let errors = '';
+        let errorMessage;
+        if (error.length > 0){ 
+            error.forEach(e => {  errors += `${e} and ` }); 
+            errorMessage = errors.slice(0, -5); 
+
+            let section = document.getElementsByClassName('cart__order__form')[0];
+            let divError = document.createElement('div'); 
+            divError.setAttribute('id', 'divError');
+        
+            divError.style = "background: red";
+            divError.innerHTML = 'Error with fields: ' + errorMessage;
+            return section.appendChild(divError); 
+        }
+        else{ 
+            fetch(`${apiBaseUrl}/order`,  { method: "POST", body: JSON.stringify({ 
+                contact : {
+                    firstName:  document.getElementById('firstName').value,
+                    lastName:  document.getElementById('lastName').value,
+                    address:  document.getElementById('address').value,
+                    city:  document.getElementById('city').value,
+                    email:  document.getElementById('email').value,
+                }, 
+                products: Object.entries(getLocalStorageJsonObject()).map(([key, value]) => { 
+                return JSON.parse(value).id;
+                })
+            }),            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            }) 
+            .then(res => { 
+                if (res.status === 201){ 
+                    return res.json();
+                }
+                else return 500
+            }) // json formatted
+            .then(res => {
+                if (res != 500){ 
+                    return window.location.replace(`/confirmation.html?orderId=${res.orderId}`);
+                }
+            }) 
+        }
+    });
 }
 
 
@@ -203,16 +223,25 @@ function toggleCartVisibility(verb){
 function checkFormValues(){ 
     let stringRegex = new RegExp(/^[a-zA-Z\s-]*$/); 
     let stringNumberRegex = new RegExp(/^[a-zA-Z\s0-9-,]*$/); 
-    let emailRegex = new RegExp(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)
+    let emailRegex = new RegExp(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/);
      
-    if (stringRegex.test(document.getElementById('firstName').value) && stringRegex.test(document.getElementById('lastName').value) && stringRegex.test(document.getElementById('city').value)){ 
-        console.log('firstname and name ok and city')
-    }if(stringNumberRegex.test(document.getElementById('address').value)){ 
-        console.log('adress ok')
-    }if(emailRegex.test(document.getElementById('email').value)){ 
-        console.log('email ok')
+
+    let formError = [];
+
+    if (!stringRegex.test(document.getElementById('firstName').value) || document.getElementById('firstName').value == ''){ 
+        formError.push('firstName');
     }
-    else{ 
-        console.log('nok')
+    if (!stringRegex.test(document.getElementById('city').value) || document.getElementById('city').value == ''){ 
+        formError.push('city');
     }
+    if (!stringRegex.test(document.getElementById('lastName').value) || document.getElementById('lastName').value == ''){ 
+        formError.push('lastName');
+    }
+    if(!stringNumberRegex.test(document.getElementById('address').value) || document.getElementById('address').value == ''){ 
+        formError.push('address');
+    }
+    if(!emailRegex.test(document.getElementById('email').value) || document.getElementById('email').value == ''){ 
+        formError.push('email');
+    }
+    return formError;
 }
