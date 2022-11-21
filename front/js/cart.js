@@ -3,18 +3,21 @@
 // call onload cart page
 function getCart(){ 
     let cart = JSON.parse(localStorage.getItem('cart')); // get the cart and parse it
-    Object.entries(cart).map(([key, value]) => {  // foreach key in cart (product) we create html article 
-        return initCartProduct(key, value); 
-    })
+    console.log(cart);
 
-    console.log(Object.keys(getLocalStorageJsonObject()).length)
+    if (cart){
+        Object.entries(cart).map(([key, value]) => {  // foreach key in cart (product) we create html article 
+            return initCartProduct(key, value); 
+        })
+    }   
 
-    if (Object.keys(getLocalStorageJsonObject()).length === 0){ 
+    if (!cart || Object.keys(getLocalStorageJsonObject()).length === 0){ 
         toggleCartVisibility('none');
     }
     else{ 
         toggleCartVisibility('block');
     }
+
 
     // add event listener on submit click
     document.getElementById("order-form").addEventListener("submit", async function(event) {
