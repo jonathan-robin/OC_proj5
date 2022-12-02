@@ -40,15 +40,3 @@ function getURLParam(url, param){
     let params = url.split('?')[1]; // split url to keep only params
     return new URLSearchParams(params).get(param);
 }
-
-// return object with all params of a url
-// @param url: the full url page
-function getURLParams(url){
-    params = url.split('?')[1] // keep the params part of the url
-    let paramsObj = {};
-    // map all the params and push to object array { [key]:[value] }
-    params.split('?').map(paramValue => {
-        Object.assign(paramsObj, { [paramValue.split('=')[0]] : paramValue.split('=')[1] })
-    })
-    return paramsObj;
-}

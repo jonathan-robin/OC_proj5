@@ -1,3 +1,4 @@
+getConfirmation();
 
 // get the confirmation orderId from url
 function getConfirmation(){ 

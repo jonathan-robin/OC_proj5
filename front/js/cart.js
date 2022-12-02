@@ -1,4 +1,8 @@
 
+window.addEventListener('load', (event) => { 
+    getCart();
+})
+
 // get entire products infos in the cart
 // call onload cart page
 function getCart(){ 

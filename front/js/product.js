@@ -1,3 +1,8 @@
+
+window.addEventListener('load', (event) => { 
+    getProduct();
+})
+
 // get one specific produt 
 function getProduct(){ 
     // get product id from url
