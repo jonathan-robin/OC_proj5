@@ -3,10 +3,14 @@ function getProduct(){
     // get product id from url
     // let params = getURLParams(window.location.href);
     let id = getURLParam(window.location.href, 'id');
-    
+
     fetch(`${apiBaseUrl}/${id}`, initFetch('GET')) // get product infos
         .then(res => res.json()) // json formatted
-        .then(res =>  initProductPage(res)) //add product infos to html
+        .then(res => {
+            document.title = res.name   
+            initProductPage(res) //add product infos to html
+        })
+
 }
 
 // init productPage with product infos
